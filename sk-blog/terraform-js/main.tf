@@ -6,6 +6,8 @@ provider "aws" {
 # S3 bucket
 resource "aws_s3_bucket" "sk_nextjs_bucket" {
     bucket = "sk-nextjs-portfolio-bucket"
+
+    force_destroy = true
 }
 
 # Ownership Control
@@ -46,7 +48,7 @@ resource "aws_s3_bucket_acl" "sk_nextjs_bucket_acl" {
 resource "aws_s3_bucket_policy" "sk_nextjs_bucket_policy" {
     bucket = aws_s3_bucket.sk_nextjs_bucket.id
 
-    policy = jsonencode ({
+    policy = jsonencode({
         Version = "2012-10-17"
         Statement = [
             {
@@ -54,7 +56,7 @@ resource "aws_s3_bucket_policy" "sk_nextjs_bucket_policy" {
                 Effect = "Allow"
                 Principal = "*"
                 Action = "s3:GetObject"
-                resource = "${aws_s3_bucket.sk_nextjs_bucket.arn}/*"
+                Resource = "${aws_s3_bucket.sk_nextjs_bucket.arn}/*"
             }
         ]
 
@@ -72,7 +74,7 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
 # Cloudfront distribution
 resource "aws_cloudfront_distribution" "nextjs_distribution" {
     origin {
-      domain_name = aws_s3_bucket.sk_nextjs_bucket.bucket_domain_name,
+      domain_name = aws_s3_bucket.sk_nextjs_bucket.bucket_domain_name
       origin_id = "S3-nextjs-portfolio-bucket"
 
       s3_origin_config {
